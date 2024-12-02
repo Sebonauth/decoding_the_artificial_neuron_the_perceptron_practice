@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Perceptron Playground</title>
+    <style>
+        /* Styles from the lesson */
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            font-size: 150%;
+        }
+        h1, h2, h3, h4 {
+            color: #333;
+            margin-top: 20px;
+        }
+        p, li {
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 20px;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        .interactive-element, .additional-content {
+            background-color: #f0f8ff; /* Light blue from vocab-section */
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .slider-container {
+            margin-bottom: 10px;
+        }
+        .slider-container label {
+            display: inline-block;
+            width: 150px;
+        }
+        .slider-container input {
+            width: 200px;
+        }
+        .perceptron-diagram {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .perceptron-diagram svg {
+            max-width: 100%;
+            height: auto;
+        }
+        .diagram-text {
+            font-size: 16px;
+            fill: #333;
+        }
+        .diagram-line {
+            stroke: #4b0082; /* Indigo color */
+            stroke-width: 4;
+        }
+        .diagram-circle {
+            fill: #fff;
+            stroke: #1e90ff; /* DodgerBlue color */
+            stroke-width: 4;
+        }
+        .diagram-rect {
+            fill: #e6e6ff; /* Light purple */
+            stroke: #4b0082; /* Indigo color */
+            stroke-width: 4;
+        }
+        /* Styles for dynamic fill */
+        .input-node {
+            stroke: #1e90ff;
+            stroke-width: 4;
+        }
+        .summation-node {
+            stroke: #d81b60; /* Pinkish color */
+            stroke-width: 4;
+        }
+        .output-node {
+            stroke: #28a745; /* Green color */
+            stroke-width: 4;
+        }
+        /* Additional styles */
+        .additional-content h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .additional-content p {
+            margin-bottom: 10px;
+        }
+        .additional-content ol {
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Perceptron Playground: The Ultimate Challenge</h1>
+    <p>Let's push the boundaries of the perceptron! Below, you'll find an interactive perceptron with two inputs. We'll tackle some truly challenging scenarios that highlight both the power and limitations of the perceptron.</p>
+
+    <div class="interactive-element">
+        <h3>Perceptron Simulator</h3>
+        <!-- Sliders for inputs, weights, and bias -->
+        <div class="slider-container">
+            <label for="input1">Input 1 (x₁):</label>
+            <input type="range" id="input1" min="-10" max="10" value="2" step="1">
+            <span id="input1-value">2</span>
+        </div>
+        <div class="slider-container">
+            <label for="input2">Input 2 (x₂):</label>
+            <input type="range" id="input2" min="-10" max="10" value="1" step="1">
+            <span id="input2-value">1</span>
+        </div>
+        <div class="slider-container">
+            <label for="weight1">Weight 1 (w₁):</label>
+            <input type="range" id="weight1" min="-2" max="2" value="0.5" step="0.1">
+            <span id="weight1-value">0.5</span>
+        </div>
+        <div class="slider-container">
+            <label for="weight2">Weight 2 (w₂):</label>
+            <input type="range" id="weight2" min="-2" max="2" value="-1" step="0.1">
+            <span id="weight2-value">-1</span>
+        </div>
+        <div class="slider-container">
+            <label for="bias">Bias (b):</label>
+            <input type="range" id="bias" min="-5" max="5" value="1" step="1">
+            <span id="bias-value">1</span>
+        </div>
+        <!-- Output display -->
+        <p>Output: <span id="output">1</span></p>
+        <!-- Perceptron Flow Diagram -->
+        <div class="perceptron-diagram">
+            <svg id="perceptron-svg" width="600" height="400">
+                <!-- Definitions for markers and clip paths -->
+                <defs>
+                    <marker id="arrow" markerWidth="10" markerHeight="7"
+                        refX="0" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#4b0082" />
+                    </marker>
+                    <!-- Clip paths for nodes -->
+                    <clipPath id="clip-input1">
+                        <circle cx="50" cy="100" r="30"></circle>
+                    </clipPath>
+                    <clipPath id="clip-input2">
+                        <circle cx="50" cy="250" r="30"></circle>
+                    </clipPath>
+                    <clipPath id="clip-bias">
+                        <circle cx="200" cy="50" r="30"></circle>
+                    </clipPath>
+                    <clipPath id="clip-summation">
+                        <circle cx="200" cy="175" r="40"></circle>
+                    </clipPath>
+                    <clipPath id="clip-output">
+                        <circle cx="510" cy="175" r="30"></circle>
+                    </clipPath>
+                </defs>
+                <!-- Input Node 1 -->
+                <g id="input1-group">
+                    <!-- Circle outline -->
+                    <circle class="diagram-circle input-node" cx="50" cy="100" r="30"></circle>
+                    <!-- Fill rectangle -->
+                    <rect id="input1-fill" x="20" y="130" width="60" height="0" fill="#1e90ff" clip-path="url(#clip-input1)"></rect>
+                    <!-- Text label -->
+                    <text class="diagram-text" x="50" y="105" text-anchor="middle">x₁</text>
+                </g>
+                <!-- Input Node 2 -->
+                <g id="input2-group">
+                    <!-- Circle outline -->
+                    <circle class="diagram-circle input-node" cx="50" cy="250" r="30"></circle>
+                    <!-- Fill rectangle -->
+                    <rect id="input2-fill" x="20" y="280" width="60" height="0" fill="#1e90ff" clip-path="url(#clip-input2)"></rect>
+                    <!-- Text label -->
+                    <text class="diagram-text" x="50" y="255" text-anchor="middle">x₂</text>
+                </g>
+                <!-- Weights -->
+                <text class="diagram-text" x="90" y="90">w₁</text>
+                <text class="diagram-text" x="90" y="240">w₂</text>
+                <!-- Lines from inputs to summation -->
+                <line class="diagram-line" x1="80" y1="100" x2="200" y2="175" marker-end="url(#arrow)"></line>
+                <line class="diagram-line" x1="80" y1="250" x2="200" y2="175" marker-end="url(#arrow)"></line>
+                <!-- Summation Node -->
+                <g id="summation-group">
+                    <!-- Circle outline -->
+                    <circle class="diagram-circle summation-node" cx="200" cy="175" r="40"></circle>
+                    <!-- Fill rectangle -->
+                    <rect id="summation-fill" x="160" y="215" width="80" height="0" fill="#d81b60" clip-path="url(#clip-summation)"></rect>
+                    <!-- Text label -->
+                    <text class="diagram-text" x="200" y="180" text-anchor="middle">∑</text>
+                </g>
+                <!-- Bias Node -->
+                <g id="bias-group">
+                    <!-- Circle outline -->
+                    <circle class="diagram-circle input-node" cx="200" cy="50" r="30"></circle>
+                    <!-- Fill rectangle -->
+                    <rect id="bias-fill" x="170" y="80" width="60" height="0" fill="#1e90ff" clip-path="url(#clip-bias)"></rect>
+                    <!-- Text label -->
+                    <text class="diagram-text" x="200" y="55" text-anchor="middle">b</text>
+                </g>
+                <!-- Line from bias to summation -->
+                <line class="diagram-line" x1="200" y1="80" x2="200" y2="135" marker-end="url(#arrow)"></line>
+                <!-- Line from summation to activation function -->
+                <line class="diagram-line" x1="240" y1="175" x2="330" y2="175" marker-end="url(#arrow)"></line>
+                <!-- Activation function rectangle -->
+                <rect class="diagram-rect" x="330" y="145" width="80" height="60"></rect>
+                <text class="diagram-text" x="370" y="180" text-anchor="middle">φ</text>
+                <!-- Line from activation function to output -->
+                <line class="diagram-line" x1="410" y1="175" x2="490" y2="175" marker-end="url(#arrow)"></line>
+                <!-- Output Node -->
+                <g id="output-group">
+                    <!-- Circle outline -->
+                    <circle class="diagram-circle output-node" cx="510" cy="175" r="30"></circle>
+                    <!-- Fill rectangle -->
+                    <rect id="output-fill" x="480" y="205" width="60" height="0" fill="#28a745" clip-path="url(#clip-output)"></rect>
+                    <!-- Text label -->
+                    <text class="diagram-text" x="510" y="180" text-anchor="middle">Output</text>
+                </g>
+            </svg>
+        </div>
+    </div>
+
+    <p>Prepare for the ultimate perceptron challenge! Try to configure the perceptron to achieve the following:</p>
+    <ol>
+        <li><strong>Input 1 Dominance:</strong> The output is solely determined by Input 1 (x₁). Input 2 (x₂) has no effect.</li>
+        <li><strong>Narrow Activation Range:</strong> The perceptron activates ONLY when the weighted sum falls between 0 and 1.</li>
+        <li><strong>Bias as a Tiebreaker:</strong> If |w₁·x₁| = |w₂·x₂|, the bias determines the output (positive bias: output 1; otherwise, output 0).</li>
+        <li><strong>Sign Agreement:</strong> Output 1 only if both inputs have the same sign.</li>
+        <li><strong>Mystery Function:</strong> Output 1 if (x₁ × x₂) &lt; b.</li>
+        <li><strong>The XOR Problem:</strong> Model an XOR (exclusive OR) gate: output 1 if either x₁ OR x₂ is positive, but NOT both.</li>
+    </ol>
+
+    <div class="additional-content">
+        <h3>Solutions (Confronting the Limitations)</h3>
+        <p>Let's break down the solutions, including the infamous XOR problem:</p>
+        <ol>
+            <li><strong>Input 1 Dominance:</strong> w₁ = non-zero, w₂ = 0, bias = any value.</li>
+            <li><strong>Narrow Activation Range:</strong> Extremely difficult with a step function! This highlights the need for smoother activation functions (coming soon!).</li>
+            <li><strong>Bias as a Tiebreaker:</strong> w₁ = 1, w₂ = -1 (or vice versa), adjust bias to control the tiebreaker behavior.</li>
+            <li><strong>Sign Agreement:</strong> Approximate solution: large equal weights for w₁ and w₂, a substantial negative bias (e.g., w₁ = 5, w₂ = 5, b = -4).</li>
+            <li><strong>Mystery Function:</strong> Small positive values for w₁ and w₂, adjust the bias (b) to fine-tune the product threshold.</li>
+            <li><strong>The XOR Problem: IMPOSSIBLE!</strong> A single perceptron cannot solve XOR. Why? Because XOR represents a non-linearly separable problem. No single straight line can separate the data points correctly. This limitation was crucial in the history of neural networks, motivating the development of multi-layer networks which <em>can</em> solve XOR.</li>
+        </ol>
+    </div>
+
+    <script>
+        // Perceptron Simulator with Interactive Diagram
+        function updatePerceptron() {
+            const input1 = parseFloat(document.getElementById('input1').value);
+            const input2 = parseFloat(document.getElementById('input2').value);
+            const weight1 = parseFloat(document.getElementById('weight1').value);
+            const weight2 = parseFloat(document.getElementById('weight2').value);
+            const bias = parseFloat(document.getElementById('bias').value);
+
+            const z = input1 * weight1 + input2 * weight2 + bias;
+            const output = z >= 0 ? 1 : 0;
+
+            document.getElementById('output').textContent = output;
+
+            // Update the perceptron diagram
+            updatePerceptronDiagram(input1, input2, weight1, weight2, bias, z, output);
+        }
+
+        function updatePerceptronDiagram(input1, input2, weight1, weight2, bias, z, output) {
+            // Normalize input values between 0 and 1
+            const normInput1 = (input1 + 10) / 20;
+            const normInput2 = (input2 + 10) / 20;
+            const normBias = (bias + 5) / 10;
+
+            // Summation node normalization (assuming z ranges from -20 to 20)
+            const normZ = (z + 20) / 40;
+
+            // Get fill rectangles
+            const input1Fill = document.getElementById('input1-fill');
+            const input2Fill = document.getElementById('input2-fill');
+            const biasFill = document.getElementById('bias-fill');
+            const summationFill = document.getElementById('summation-fill');
+            const outputFill = document.getElementById('output-fill');
+
+            // Function to update fill rectangle
+            function updateFillRect(rect, normValue, cx, cy, radius) {
+                const maxFillHeight = radius * 2;
+                const fillHeight = maxFillHeight * normValue;
+                const fillY = cy + radius - fillHeight;
+                rect.setAttribute('y', fillY);
+                rect.setAttribute('height', fillHeight);
+            }
+
+            // Update fills for input nodes
+            updateFillRect(input1Fill, normInput1, 50, 100, 30);
+            updateFillRect(input2Fill, normInput2, 50, 250, 30);
+            // Update fill for bias node
+            updateFillRect(biasFill, normBias, 200, 50, 30);
+            // Update fill for summation node
+            const clampedNormZ = Math.max(0, Math.min(normZ, 1)); // Clamp between 0 and 1
+            updateFillRect(summationFill, clampedNormZ, 200, 175, 40);
+            // Update fill for output node
+            updateFillRect(outputFill, output, 510, 175, 30);
+        }
+
+        // Update value displays and recalculate on slider change
+        const sliders = ['input1', 'input2', 'weight1', 'weight2', 'bias'];
+        sliders.forEach(id => {
+            const slider = document.getElementById(id);
+            const valueDisplay = document.getElementById(id + '-value');
+            slider.addEventListener('input', () => {
+                valueDisplay.textContent = slider.value;
+                updatePerceptron();
+            });
+        });
+
+        // Initial calculation
+        updatePerceptron();
+    </script>
+</body>
+</html>
+
+
+
+
